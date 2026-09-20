@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-09-20T20:12:30.614891+00:00",
+  "scope": "isolated local Convex snapshot restoration; fictional fixture data only",
+  "source": {
+    "cloudPort": 8790,
+    "sitePort": 8791,
+    "leftRunning": true
+  },
+  "target": {
+    "cloudPort": 8792,
+    "sitePort": 8793,
+    "initialApplicationTablesEmpty": true,
+    "importMode": "default import into empty target; no replace flags",
+    "stoppedAfterVerification": true
+  },
+  "snapshot": {
+    "sha256": "e9b1e459539fe58fcd1965bae038d46761bb0c2f665098a08f6e4c3bf50b7e6c",
+    "includedFileStorage": true
+  },
+  "checks": {
+    "fixtureWorkspace": true,
+    "fixtureAgentPreferences": true,
+    "fixtureWikiBody": true,
+    "fixtureTaskStateFailedBeforeDispatch": true,
+    "fixtureStoredFileBytesExact": true,
+    "fileStorageHashComparison": true,
+    "allExportedTableRowsExact": true
+  },
+  "counts": {
+    "applicationTablesCompared": 27,
+    "applicationDocumentsCompared": 20,
+    "componentTablesCompared": 17,
+    "componentDocumentsCompared": 5,
+    "storedFilesCompared": 1
+  },
+  "workflowComponent": {
+    "nestedComponentsIncluded": [
+      "workflow",
+      "workflow/workpool",
+      "workflow/workpool/batchWorker"
+    ],
+    "configurationAndWorkerMetadataExact": true,
+    "activeWorkflowDocumentsInSnapshot": 0,
+    "workflowStepsInSnapshot": 0,
+    "workflowEventsInSnapshot": 0,
+    "activeRecoveryVerified": false,
+    "classification": "component metadata restore verified; in-flight recovery untested"
+  },
+  "limits": [
+    "Local-only rehearsal, not a production cloud restore.",
+    "Fixture authorization uses local administrator identity impersonation; this does not verify a real OIDC login.",
+    "Snapshot contains no active workflow, pending approval, external intent or routine, so in-flight recovery and scheduled-job recovery are untested.",
+    "No provider key was installed and external writes were disabled; no paid model request or email was sent.",
+    "Secret configuration was set separately on the target, not restored from the archive."
+  ]
+}

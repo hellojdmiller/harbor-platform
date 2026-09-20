@@ -1,0 +1,8 @@
+node_modules
+.next
+.convex
+work
+convex/_generated
+package-lock.json
+playwright-report
+test-results
