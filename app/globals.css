@@ -1227,10 +1227,10 @@ code {
     --sidebar: 240px;
   }
   .sidebar {
-    transform: translateX(-100%);
+    display: none;
   }
   .sidebar.is-open {
-    transform: translateX(0);
+    display: flex;
     box-shadow: 10px 0 50px #12392730;
   }
   .main-shell {
@@ -1406,4 +1406,19 @@ code {
 }
 .email-composer p {
   font-size: 11px;
+}
+
+.sidebar-backdrop {
+  display: none;
+}
+@media (max-width: 680px) {
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 19;
+    border: 0;
+    border-radius: 0;
+    background: #20362d22;
+  }
 }

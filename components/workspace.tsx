@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowUp,
   BookOpen,
@@ -20,7 +20,6 @@ import {
   Search,
   Settings2,
   ShieldCheck,
-  SlidersHorizontal,
   Sparkles,
   Users,
   X,
@@ -107,6 +106,8 @@ export function Workspace({
   const [emailDraft, setEmailDraft] = useState(false),
     [recipient, setRecipient] = useState(""),
     [subject, setSubject] = useState("");
+  const dialogRef = useRef<HTMLElement>(null);
+  const [editingPageId, setEditingPageId] = useState<string>();
   const [draftRevision, setDraftRevision] = useState<number>();
   const [model, setModel] = useState(models?.[0]);
   const [view, setView] = useState<View>("home"),
@@ -121,7 +122,42 @@ export function Workspace({
     [search, setSearch] = useState(""),
     [agent, setAgent] = useState(data.agent);
   const page = data.wiki.find((p) => p.id === wikiId) ?? data.wiki[0];
-  const currentTask = data.tasks.find((t) => t.id === selected?.id) ?? selected;
+  const currentTask = data.tasks.find((t) => t.id === selected?.id);
+  useEffect(() => {
+    if (editingPageId && !data.wiki.some((p) => p.id === editingPageId)) {
+      setEditing(false);
+      setDraft("");
+      setEditingPageId(undefined);
+    }
+  }, [data.wiki, editingPageId]);
+  useEffect(() => {
+    if (!currentTask) return;
+    const before = document.activeElement as HTMLElement | null;
+    dialogRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    const key = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelected(undefined);
+      if (event.key !== "Tab") return;
+      const elements = Array.from(
+        dialogRef.current?.querySelectorAll<HTMLElement>(
+          "button:not([disabled]), a[href], input, textarea, select",
+        ) ?? [],
+      );
+      const first = elements[0],
+        last = elements.at(-1);
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    };
+    document.addEventListener("keydown", key);
+    return () => {
+      document.removeEventListener("keydown", key);
+      before?.focus();
+    };
+  }, [currentTask?.id]);
   const run = async (fn: () => Promise<void>, success?: string) => {
     setBusy(true);
     setNotice(undefined);
@@ -158,7 +194,10 @@ export function Workspace({
   ).length;
   return (
     <div className="application">
-      <aside className={`sidebar ${menu ? "is-open" : ""}`}>
+      <aside
+        inert={Boolean(currentTask)}
+        className={`sidebar ${menu ? "is-open" : ""}`}
+      >
         <a className="brand" href={demo ? "/demo" : "/"}>
           <Compass size={29} strokeWidth={1.8} />
           <span>Harbor</span>
@@ -239,7 +278,14 @@ export function Workspace({
           </div>
         </div>
       </aside>
-      <div className="main-shell">
+      {menu && (
+        <button
+          className="sidebar-backdrop"
+          aria-label="Close navigation"
+          onClick={() => setMenu(false)}
+        />
+      )}
+      <div className="main-shell" inert={Boolean(currentTask)}>
         <header className="topbar">
           <div className="breadcrumb">
             <button
@@ -581,6 +627,7 @@ export function Workspace({
                           onClick={() => {
                             setDraft(page.body);
                             setDraftRevision(page.revision);
+                            setEditingPageId(page.id);
                             setEditing(!editing);
                           }}
                         >
@@ -867,6 +914,7 @@ export function Workspace({
       {currentTask && (
         <div className="modal-scrim" onClick={() => setSelected(undefined)}>
           <section
+            ref={dialogRef}
             className="task-dialog"
             role="dialog"
             aria-modal="true"
